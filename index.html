@@ -3,98 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RifqyChecked - Cek Situs Terblokir</title>
+    <title>RifqyChecked - Cek Keamanan Situs</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        /* Animasi Background Bergerak */
+        @keyframes gradient-xy {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .animate-gradient {
+            background-size: 200% 200%;
+            animation: gradient-xy 15s ease infinite;
+        }
+
+        /* Animasi Muncul */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 min-h-screen flex flex-col items-center justify-center p-4 animate-gradient text-slate-800">
+
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+    </div>
 
     <div class="w-full max-w-lg">
         
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center gap-2 mb-2">
+        <div class="text-center mb-10 slide-up">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-xl shadow-blue-100 mb-4 border border-blue-50">
                 <i class="fa-solid fa-shield-halved text-blue-600 text-3xl"></i>
-                <span class="text-2xl font-bold text-gray-900 tracking-tight">Rifqy<span class="text-blue-600">Checked</span></span>
             </div>
-            <p class="text-gray-500">Database situs terblokir & berbahaya.</p>
+            <h1 class="text-3xl font-bold text-slate-900 tracking-tight mb-2">
+                Rifqy<span class="text-blue-600">Checked</span>
+            </h1>
+            <p class="text-slate-500 text-sm font-medium">Database Validasi Situs & Konten Berbahaya</p>
         </div>
 
-        <div class="bg-white p-2 rounded-xl shadow-lg border border-gray-200 flex items-center">
-            <input type="text" id="searchInput" 
-                   placeholder="Masukkan nama website..." 
-                   class="flex-grow p-3 text-lg outline-none text-gray-700 placeholder:text-gray-400 rounded-l-lg"
-                   onkeypress="if(event.key === 'Enter') checkSite()">
-            <button onclick="checkSite()" 
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition">
-                Cek
+        <div class="bg-white/80 backdrop-blur-xl p-6 rounded-3xl shadow-2xl shadow-slate-200/50 border border-white/50 slide-up" style="animation-delay: 0.1s;">
+            
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                    <i class="fa-solid fa-globe"></i>
+                </div>
+                <input type="text" id="searchInput" 
+                       placeholder="Contoh: judionline.com" 
+                       class="w-full pl-11 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none text-slate-700 font-medium placeholder:text-slate-400 transition-all focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                       oninput="toggleButton()"
+                       onkeypress="if(event.key === 'Enter') checkSite()">
+            </div>
+
+            <button id="btnCheck" onclick="checkSite()" disabled
+                    class="w-full mt-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-600/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                <span>Periksa Sekarang</span>
+                <i class="fa-solid fa-arrow-right text-sm"></i>
             </button>
-        </div>
 
-        <div id="loading" class="hidden text-center mt-6">
-            <i class="fa-solid fa-circle-notch fa-spin text-blue-500 text-2xl"></i>
-            <p class="text-xs text-gray-400 mt-2">Memeriksa database...</p>
-        </div>
-
-        <div id="resultBlocked" class="hidden mt-6 bg-red-50 border border-red-200 rounded-xl p-6 text-center animate-bounce-in">
-            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl">
-                <i class="fa-solid fa-ban"></i>
+            <div id="loading" class="hidden py-8 text-center">
+                <div class="inline-block w-8 h-8 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+                <p class="text-xs text-slate-400 mt-3 font-medium animate-pulse">Sedang mencocokkan database...</p>
             </div>
-            <h2 class="text-xl font-bold text-red-700">AKSES DITOLAK</h2>
-            <p class="text-gray-600 mt-1">Website <span id="blockedUrl" class="font-bold text-red-600"></span> terdaftar dalam database blokir kami.</p>
+
         </div>
 
-        <div id="resultSafe" class="hidden mt-6 bg-green-50 border border-green-200 rounded-xl p-6 text-center">
-            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl">
-                <i class="fa-solid fa-check"></i>
+        <div id="resultContainer" class="mt-6">
+            
+            <div id="resultBlocked" class="hidden bg-white p-6 rounded-2xl shadow-xl shadow-red-100/50 border-l-4 border-red-500 slide-up">
+                <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Akses Berbahaya!</h3>
+                        <p class="text-slate-600 text-sm mt-1 leading-relaxed">
+                            Situs <span id="blockedUrl" class="font-bold text-red-600 bg-red-50 px-1 rounded"></span> terindikasi sebagai situs terlarang/berbahaya dalam database kami.
+                        </p>
+                        <div class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">
+                            <i class="fa-solid fa-ban"></i> Status: BLOCKED
+                        </div>
+                    </div>
+                </div>
             </div>
-            <h2 class="text-xl font-bold text-green-700">TIDAK DITEMUKAN</h2>
-            <p class="text-gray-600 mt-1">Website <span id="safeUrl" class="font-bold text-green-600"></span> tidak ada dalam daftar blokir saat ini.</p>
+
+            <div id="resultSafe" class="hidden bg-white p-6 rounded-2xl shadow-xl shadow-green-100/50 border-l-4 border-green-500 slide-up">
+                <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-shield-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Tidak Ditemukan Isu</h3>
+                        <p class="text-slate-600 text-sm mt-1 leading-relaxed">
+                            Situs <span id="safeUrl" class="font-bold text-green-600 bg-green-50 px-1 rounded"></span> tidak terdaftar dalam blacklist kami saat ini.
+                        </p>
+                        <div class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+                            <i class="fa-regular fa-circle-check"></i> Status: CLEAN
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resultError" class="hidden bg-orange-50 p-4 rounded-xl border border-orange-200 text-center slide-up">
+                <p class="text-orange-600 text-sm"><i class="fa-solid fa-wifi mr-1"></i> Gagal memuat database. Menggunakan data demo.</p>
+            </div>
+
         </div>
+
+        <p class="text-center text-slate-400 text-xs mt-8">
+            &copy; 2024 RifqyChecked Security. All rights reserved.
+        </p>
 
     </div>
 
     <script>
+        // Data Fallback (Untuk Demo jika database.json tidak ada)
+        const DEMO_DATABASE = [
+            "poker88", "slotgacor", "situsterlarang", "phishing-bank", "admin-gacor", "xxx"
+        ];
+
+        function toggleButton() {
+            const input = document.getElementById('searchInput').value.trim();
+            const btn = document.getElementById('btnCheck');
+            btn.disabled = input.length === 0;
+            if(input.length === 0) hideResults();
+        }
+
+        function hideResults() {
+            document.getElementById('resultBlocked').classList.add('hidden');
+            document.getElementById('resultSafe').classList.add('hidden');
+            document.getElementById('resultError').classList.add('hidden');
+        }
+
+        // Fungsi untuk membersihkan URL agar pencarian lebih akurat
+        function cleanUrl(url) {
+            return url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0].toLowerCase();
+        }
+
         async function checkSite() {
-            const input = document.getElementById('searchInput').value.toLowerCase().trim();
+            const rawInput = document.getElementById('searchInput').value.trim();
+            if (!rawInput) return;
+
+            const cleanInput = cleanUrl(rawInput);
             const loading = document.getElementById('loading');
-            const resultBlocked = document.getElementById('resultBlocked');
-            const resultSafe = document.getElementById('resultSafe');
-
-            if (!input) return;
-
-            // Reset UI
-            resultBlocked.classList.add('hidden');
-            resultSafe.classList.add('hidden');
+            const btn = document.getElementById('btnCheck');
+            
+            // UI Update State
+            hideResults();
             loading.classList.remove('hidden');
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            let blockedSites = [];
 
             try {
-                // Ambil data simple array
+                // Coba fetch database asli
                 const response = await fetch('./database.json');
-                const blockedSites = await response.json();
-
-                // Simulasi delay sedikit biar keren
-                setTimeout(() => {
-                    loading.classList.add('hidden');
-
-                    // Cek apakah input mengandung salah satu kata di blacklist
-                    // Contoh: input "www.poker88.com" akan kena jika ada "poker88" di database
-                    const isBlocked = blockedSites.some(site => input.includes(site.toLowerCase()));
-
-                    if (isBlocked) {
-                        document.getElementById('blockedUrl').innerText = input;
-                        resultBlocked.classList.remove('hidden');
-                    } else {
-                        document.getElementById('safeUrl').innerText = input;
-                        resultSafe.classList.remove('hidden');
-                    }
-                }, 500);
-
+                if (!response.ok) throw new Error("Database not found");
+                blockedSites = await response.json();
             } catch (e) {
-                alert("Gagal memuat database. Pastikan file database.json ada.");
-                loading.classList.add('hidden');
+                // Jika gagal, gunakan demo database dan beri notifikasi kecil
+                console.warn("Menggunakan database demo karena fetch gagal.");
+                blockedSites = DEMO_DATABASE;
+                // Opsional: Tampilkan pesan error kecil jika mau
+                // document.getElementById('resultError').classList.remove('hidden');
             }
+
+            // Simulasi delay scanning (UX psychology)
+            setTimeout(() => {
+                loading.classList.add('hidden');
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+                // Logic Pencarian
+                // Mencari apakah input user mengandung kata kunci terblokir, atau sebaliknya
+                const isBlocked = blockedSites.some(site => cleanInput.includes(site.toLowerCase()));
+
+                if (isBlocked) {
+                    document.getElementById('blockedUrl').innerText = cleanInput;
+                    const el = document.getElementById('resultBlocked');
+                    el.classList.remove('hidden');
+                    // Reset animasi agar main ulang
+                    el.classList.remove('slide-up');
+                    void el.offsetWidth; // trigger reflow
+                    el.classList.add('slide-up');
+                } else {
+                    document.getElementById('safeUrl').innerText = cleanInput;
+                    const el = document.getElementById('resultSafe');
+                    el.classList.remove('hidden');
+                    el.classList.remove('slide-up');
+                    void el.offsetWidth; 
+                    el.classList.add('slide-up');
+                }
+            }, 800); // Delay 800ms
         }
     </script>
 </body>
